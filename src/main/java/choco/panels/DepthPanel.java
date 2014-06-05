@@ -34,7 +34,6 @@ import org.jfree.data.xy.XYSeriesCollection;
 import solver.search.loop.monitors.IMonitorOpenNode;
 
 import javax.swing.*;
-import java.awt.*;
 
 /**
  * <br/>
@@ -57,10 +56,9 @@ public class DepthPanel extends APanel implements IMonitorOpenNode {
         JFreeChart chart = ChartFactory.createXYLineChart(
                 "Depth", "Nodes", "Depth", scoll);
         this.setChart(chart);
-        this.setPreferredSize(new Dimension(600, 600));
-        solver.plugMonitor(this);
-        this.setVisible(true);
+
         tabbedpanel.addTab("Depth", this);
+        solver.plugMonitor(this);
     }
 
 

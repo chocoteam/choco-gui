@@ -31,7 +31,6 @@ import org.jfree.chart.ChartFactory;
 import org.jfree.chart.JFreeChart;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
-import solver.ResolutionPolicy;
 import solver.search.loop.monitors.IMonitorOpenNode;
 import solver.variables.IntVar;
 
@@ -43,57 +42,49 @@ import javax.swing.*;
  * @author Charles Prud'homme
  * @since 05/06/2014
  */
-public class ObjectivePanel extends APanel implements IMonitorOpenNode {
-    XYSeries objective, bounds;
-    boolean isOpt;
-    boolean isMax;
+public class LogDomSizePanel extends APanel implements IMonitorOpenNode {
+    XYSeries series;
 
-    public ObjectivePanel(GUI frame) {
+    public LogDomSizePanel(GUI frame) {
         super(frame);
     }
 
     @Override
     public void plug(JTabbedPane tabbedpanel) {
-        isOpt = solver.getObjectiveManager().getPolicy() != ResolutionPolicy.SATISFACTION;
-        isMax = solver.getObjectiveManager().getPolicy() == ResolutionPolicy.MAXIMIZE;
-        objective = new XYSeries("Best value");
-        bounds = new XYSeries(isMax ? "Upper bound" : "Lower bound");
-        XYSeriesCollection coll = new XYSeriesCollection();
-        coll.addSeries(objective);
-        coll.addSeries(bounds);
+        series = new XYSeries("Log. dom. size");
+        XYSeriesCollection scoll = new XYSeriesCollection();
+        scoll.addSeries(series);
+        JFreeChart chart = ChartFactory.createXYLineChart(
+                "Log. Dom. Size", "Nodes", "log(dom.size)", scoll);
+        this.setChart(chart);
 
-        JFreeChart dchart = ChartFactory.createXYLineChart(
-                "Objective", "Nodes", "Objective", coll);
-
-        this.setChart(dchart);
-        if (isOpt) {
-            tabbedpanel.addTab("Objective", this);
-            solver.plugMonitor(this);
-        }
+        tabbedpanel.addTab("log(dom.size)", this);
+        solver.plugMonitor(this);
     }
 
 
     @Override
     public void unplug() {
-
+        //solver.unplugMonitor(this);
+        this.setVisible(false);
     }
 
     @Override
     public void beforeOpenNode() {
-
     }
 
     @Override
     public void afterOpenNode() {
-        if (frame.canUpdate() && isOpt) {
-            long ncount = solver.getMeasures().getNodeCount();
-            if (solver.getMeasures().getSolutionCount() > 0) {
-                objective.add(ncount, solver.getObjectiveManager().getBestSolutionValue());
-            }
-            bounds.add(ncount, isMax ?
-                    ((IntVar) solver.getObjectiveManager().getObjective()).getUB() :
-                    ((IntVar) solver.getObjectiveManager().getObjective()).getLB()
-            );
+        if (frame.canUpdate()) {
+            series.add(solver.getMeasures().getNodeCount(), logdomsizIt());
         }
+    }
+
+    private double logdomsizIt() {
+        double lds = 0.0;
+        for (int i = 0; i < solver.getNbVars(); i++) {
+            lds += Math.log(((IntVar) solver.getVar(i)).getDomainSize());
+        }
+        return lds;
     }
 }

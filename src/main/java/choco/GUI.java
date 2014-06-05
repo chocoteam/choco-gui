@@ -27,13 +27,13 @@
 package choco;
 
 import choco.panels.DepthPanel;
+import choco.panels.LogDomSizePanel;
 import choco.panels.ObjectivePanel;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.ui.tabbedui.VerticalLayout;
 import solver.Solver;
 import solver.search.loop.monitors.IMonitorInitialize;
 import solver.search.loop.monitors.IMonitorOpenNode;
-import solver.variables.IntVar;
 import util.tools.StringUtils;
 
 import javax.swing.*;
@@ -145,14 +145,6 @@ public class GUI extends JFrame implements IMonitorOpenNode, IMonitorInitialize 
     public void afterOpenNode() {
     }
 
-    private double logdomsizIt() {
-        double lds = 0.0;
-        for (int i = 0; i < solver.getNbVars(); i++) {
-            lds += Math.log(((IntVar) solver.getVar(i)).getDomainSize());
-        }
-        return lds;
-    }
-
     public Solver getSolver() {
         return solver;
     }
@@ -163,10 +155,9 @@ public class GUI extends JFrame implements IMonitorOpenNode, IMonitorInitialize 
 
     @Override
     public void beforeInitialize() {
+        new LogDomSizePanel(this).plug(tabbedpanel);
         new DepthPanel(this).plug(tabbedpanel);
         new ObjectivePanel(this).plug(tabbedpanel);
-        tabbedpanel.setSelectedIndex(-1);
-        tabbedpanel.setSelectedIndex(1);
         while (!play.get()) ;
 
     }
