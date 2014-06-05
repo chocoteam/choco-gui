@@ -14,6 +14,12 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
+    <scm>
+        <connection>scm:git:git@github.com:cprudhom/choco-GUI.git</connection>
+        <url>scm:git:git://github.com/cprudhom/choco-GUI</url>
+        <developerConnection>scm:git:git@github.com:cprudhom/choco-GUI.git</developerConnection>
+        <tag>HEAD</tag>
+    </scm>
     <dependencies>
         <dependency>
             <groupId>choco</groupId>

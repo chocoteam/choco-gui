@@ -60,10 +60,8 @@ public class GUI extends JFrame implements IMonitorOpenNode, IMonitorInitialize 
 
     JButton playB = new JButton("Run");
     JButton pauseB = new JButton("Pause");
-    JButton stopB = new JButton("Stop");
 
     AtomicBoolean play = new AtomicBoolean(false);
-    AtomicBoolean stop = new AtomicBoolean(false);
     JCheckBox samplingCB = new JCheckBox("Sampling");
     AtomicBoolean sampling = new AtomicBoolean(false);
     JPanel leftpanel = new JPanel(new VerticalLayout());
@@ -102,17 +100,6 @@ public class GUI extends JFrame implements IMonitorOpenNode, IMonitorInitialize 
         };
         playB.addActionListener(actionListener);
         pauseB.addActionListener(actionListener);
-        leftpanel.add(stopB);
-        stopB.setEnabled(true);
-        stopB.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                stop.set(true);
-                playB.setEnabled(false);
-                pauseB.setEnabled(false);
-                stopB.setEnabled(false);
-            }
-        });
 
         leftpanel.add(samplingCB);
         samplingCB.setEnabled(true);
@@ -156,9 +143,6 @@ public class GUI extends JFrame implements IMonitorOpenNode, IMonitorInitialize 
 
     @Override
     public void afterOpenNode() {
-        if (stop.get()) {
-            solver.getSearchLoop().interrupt("User interruption");
-        }
     }
 
     private double logdomsizIt() {
