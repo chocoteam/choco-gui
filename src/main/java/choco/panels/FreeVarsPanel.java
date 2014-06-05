@@ -41,23 +41,23 @@ import javax.swing.*;
  * @author Charles Prud'homme
  * @since 05/06/2014
  */
-public class DepthPanel extends APanel implements IMonitorOpenNode {
-    XYSeries depth;
+public class FreeVarsPanel extends APanel implements IMonitorOpenNode {
+    XYSeries series;
 
-    public DepthPanel(GUI frame) {
+    public FreeVarsPanel(GUI frame) {
         super(frame);
     }
 
     @Override
     public void plug(JTabbedPane tabbedpanel) {
-        depth = new XYSeries("Depth");
+        series = new XYSeries("Free variables");
         XYSeriesCollection scoll = new XYSeriesCollection();
-        scoll.addSeries(depth);
+        scoll.addSeries(series);
         JFreeChart chart = ChartFactory.createXYLineChart(
-                "Depth", "Nodes", "Depth", scoll);
+                "Free variables", "Nodes", "free vars", scoll);
         this.setChart(chart);
 
-        tabbedpanel.addTab("Depth", this);
+        tabbedpanel.addTab("free vars", this);
         solver.plugMonitor(this);
     }
 
@@ -74,11 +74,19 @@ public class DepthPanel extends APanel implements IMonitorOpenNode {
     @Override
     public void afterOpenNode() {
         if (frame.canUpdate()) {
-            depth.add(solver.getMeasures().getNodeCount(), solver.getMeasures().getCurrentDepth());
+            series.add(solver.getMeasures().getNodeCount(), compute());
         }
         if (flush) {
-            depth.clear();
+            series.clear();
             flushDone();
         }
+    }
+
+    private double compute() {
+        double lds = 0.0;
+        for (int i = 0; i < solver.getNbVars(); i++) {
+            lds += solver.getVar(i).isInstantiated() ? 1 : 0;
+        }
+        return solver.getNbVars() - lds;
     }
 }

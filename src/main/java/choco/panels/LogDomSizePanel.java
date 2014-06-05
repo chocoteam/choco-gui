@@ -62,7 +62,6 @@ public class LogDomSizePanel extends APanel implements IMonitorOpenNode {
         solver.plugMonitor(this);
     }
 
-
     @Override
     public void unplug() {
         //solver.unplugMonitor(this);
@@ -77,6 +76,10 @@ public class LogDomSizePanel extends APanel implements IMonitorOpenNode {
     public void afterOpenNode() {
         if (frame.canUpdate()) {
             series.add(solver.getMeasures().getNodeCount(), logdomsizIt());
+        }
+        if(flush){
+            series.clear();
+            flushDone();
         }
     }
 

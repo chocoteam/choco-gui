@@ -42,6 +42,7 @@ public abstract class APanel extends ChartPanel {
 
     Solver solver;
     GUI frame;
+    boolean flush;
 
     public APanel(GUI frame) {
         super(null);
@@ -53,4 +54,11 @@ public abstract class APanel extends ChartPanel {
 
     public abstract void unplug();
 
+    public final void flushData() {
+        flush = true;
+    }
+
+    protected final void flushDone() {
+        flush = false;
+    }
 }

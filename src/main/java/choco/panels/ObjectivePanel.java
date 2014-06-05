@@ -72,7 +72,6 @@ public class ObjectivePanel extends APanel implements IMonitorOpenNode {
         }
     }
 
-
     @Override
     public void unplug() {
 
@@ -94,6 +93,11 @@ public class ObjectivePanel extends APanel implements IMonitorOpenNode {
                     ((IntVar) solver.getObjectiveManager().getObjective()).getUB() :
                     ((IntVar) solver.getObjectiveManager().getObjective()).getLB()
             );
+        }
+        if (flush) {
+            objective.clear();
+            bounds.clear();
+            flushDone();
         }
     }
 }

@@ -26,10 +26,7 @@
  */
 package choco;
 
-import choco.panels.DepthPanel;
-import choco.panels.LogDomSizePanel;
-import choco.panels.ObjectivePanel;
-import org.jfree.data.xy.XYSeries;
+import choco.panels.*;
 import org.jfree.ui.tabbedui.VerticalLayout;
 import solver.Solver;
 import solver.search.loop.monitors.IMonitorInitialize;
@@ -40,6 +37,8 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
@@ -52,14 +51,14 @@ public class GUI extends JFrame implements IMonitorOpenNode, IMonitorInitialize 
 
     Solver solver;
     public static int DEFAULT_NODE_WAIT = 1000;
-    XYSeries logdomsiz;
-
+    List<APanel> panels = new LinkedList<APanel>();
 
     // SWING
     JTabbedPane tabbedpanel = new JTabbedPane();
 
     JButton playB = new JButton("Run");
     JButton pauseB = new JButton("Pause");
+    JButton flushB = new JButton("Flush");
 
     AtomicBoolean play = new AtomicBoolean(false);
     JCheckBox samplingCB = new JCheckBox("Sampling");
@@ -100,6 +99,17 @@ public class GUI extends JFrame implements IMonitorOpenNode, IMonitorInitialize 
         };
         playB.addActionListener(actionListener);
         pauseB.addActionListener(actionListener);
+
+        leftpanel.add(flushB);
+        flushB.setEnabled(true);
+        flushB.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                for (APanel panel : panels) {
+                    panel.flushData();
+                }
+            }
+        });
 
         leftpanel.add(samplingCB);
         samplingCB.setEnabled(true);
@@ -155,9 +165,13 @@ public class GUI extends JFrame implements IMonitorOpenNode, IMonitorInitialize 
 
     @Override
     public void beforeInitialize() {
-        new LogDomSizePanel(this).plug(tabbedpanel);
-        new DepthPanel(this).plug(tabbedpanel);
-        new ObjectivePanel(this).plug(tabbedpanel);
+//        panels.add(new LogDomSizePanel(this));
+        panels.add(new FreeVarsPanel(this));
+        panels.add(new DepthPanel(this));
+        panels.add(new ObjectivePanel(this));
+        for (APanel panel : panels) {
+            panel.plug(tabbedpanel);
+        }
         while (!play.get()) ;
 
     }
