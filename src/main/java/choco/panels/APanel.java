@@ -43,6 +43,7 @@ public abstract class APanel extends ChartPanel {
     Solver solver;
     GUI frame;
     boolean flush;
+    boolean activate;
 
     public APanel(GUI frame) {
         super(null);
@@ -50,9 +51,14 @@ public abstract class APanel extends ChartPanel {
         this.solver = frame.getSolver();
     }
 
-    public abstract void plug(JTabbedPane tabbedpanel);
+    public void plug(JTabbedPane tabbedpanel){
+        activate = true;
+    }
 
-    public abstract void unplug();
+    public void unplug(JTabbedPane tabbedpanel) {
+        tabbedpanel.remove(this);
+        activate = false;
+    }
 
     public final void flushData() {
         flush = true;

@@ -46,25 +46,19 @@ public class DepthPanel extends APanel implements IMonitorOpenNode {
 
     public DepthPanel(GUI frame) {
         super(frame);
-    }
-
-    @Override
-    public void plug(JTabbedPane tabbedpanel) {
         depth = new XYSeries("Depth");
         XYSeriesCollection scoll = new XYSeriesCollection();
         scoll.addSeries(depth);
         JFreeChart chart = ChartFactory.createXYLineChart(
                 "Depth", "Nodes", "Depth", scoll);
         this.setChart(chart);
-
-        tabbedpanel.addTab("Depth", this);
         solver.plugMonitor(this);
     }
 
     @Override
-    public void unplug() {
-        //solver.unplugMonitor(this);
-        this.setVisible(false);
+    public void plug(JTabbedPane tabbedpanel) {
+        super.plug(tabbedpanel);
+        tabbedpanel.addTab("Depth", this);
     }
 
     @Override
@@ -73,7 +67,7 @@ public class DepthPanel extends APanel implements IMonitorOpenNode {
 
     @Override
     public void afterOpenNode() {
-        if (frame.canUpdate()) {
+        if (frame.canUpdate() && activate) {
             depth.add(solver.getMeasures().getNodeCount(), solver.getMeasures().getCurrentDepth());
         }
         if (flush) {

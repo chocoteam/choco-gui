@@ -46,26 +46,21 @@ public class FreeVarsPanel extends APanel implements IMonitorOpenNode {
 
     public FreeVarsPanel(GUI frame) {
         super(frame);
-    }
-
-    @Override
-    public void plug(JTabbedPane tabbedpanel) {
         series = new XYSeries("Free variables");
         XYSeriesCollection scoll = new XYSeriesCollection();
         scoll.addSeries(series);
         JFreeChart chart = ChartFactory.createXYLineChart(
                 "Free variables", "Nodes", "free vars", scoll);
         this.setChart(chart);
-
-        tabbedpanel.addTab("free vars", this);
         solver.plugMonitor(this);
     }
 
     @Override
-    public void unplug() {
-        //solver.unplugMonitor(this);
-        this.setVisible(false);
+    public void plug(JTabbedPane tabbedpanel) {
+        super.plug(tabbedpanel);
+        tabbedpanel.addTab("free vars", this);
     }
+
 
     @Override
     public void beforeOpenNode() {
@@ -73,7 +68,7 @@ public class FreeVarsPanel extends APanel implements IMonitorOpenNode {
 
     @Override
     public void afterOpenNode() {
-        if (frame.canUpdate()) {
+        if (frame.canUpdate() && activate) {
             series.add(solver.getMeasures().getNodeCount(), compute());
         }
         if (flush) {

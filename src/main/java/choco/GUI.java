@@ -26,19 +26,18 @@
  */
 package choco;
 
-import choco.panels.*;
+import choco.panels.Parameters;
 import org.jfree.ui.tabbedui.VerticalLayout;
 import solver.Solver;
 import solver.search.loop.monitors.IMonitorInitialize;
 import solver.search.loop.monitors.IMonitorOpenNode;
+import solver.search.loop.monitors.IMonitorSolution;
 import util.tools.StringUtils;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
@@ -47,26 +46,32 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * @author Charles Prud'homme
  * @since 02/06/2014
  */
-public class GUI extends JFrame implements IMonitorOpenNode, IMonitorInitialize {
+public class GUI extends JFrame implements IMonitorOpenNode, IMonitorInitialize, IMonitorSolution {
 
     Solver solver;
     public static int DEFAULT_NODE_WAIT = 1000;
-    List<APanel> panels = new LinkedList<APanel>();
+    Parameters parameters;
+
 
     // SWING
     JTabbedPane tabbedpanel = new JTabbedPane();
 
     JButton playB = new JButton("Run");
     JButton pauseB = new JButton("Pause");
-    JButton flushB = new JButton("Flush");
+    JButton flushallB = new JButton("Flush");
+    JButton nextSolB = new JButton("Next solution");
+    JButton nextNodeB = new JButton("Next node");
 
     AtomicBoolean play = new AtomicBoolean(false);
+    AtomicBoolean nextSol = new AtomicBoolean(false);
+    AtomicBoolean nextNode = new AtomicBoolean(false);
+
     JCheckBox samplingCB = new JCheckBox("Sampling");
     AtomicBoolean sampling = new AtomicBoolean(false);
     JPanel leftpanel = new JPanel(new VerticalLayout());
     JLabel[] statistics = new JLabel[10];
 
-    private static final int VAR = 1, CSTR = 2, SOL = 3, FAI = 4, BCK = 5, NOD = 6, TIM = 7, NpS = 8;
+    private static final int VAR = 1, CSTR = 2, SOL = 3, FAI = 4, BCK = 5, NOD = 6, RES = 7, TIM = 8, NpS = 9;
 
 
     public GUI(Solver solver) {
@@ -75,6 +80,7 @@ public class GUI extends JFrame implements IMonitorOpenNode, IMonitorInitialize 
     }
 
     public void init() {
+        parameters = new Parameters(this);
         createButtons();
         add(tabbedpanel, BorderLayout.CENTER);
         //add(, BorderLayout.CENTER);
@@ -93,21 +99,58 @@ public class GUI extends JFrame implements IMonitorOpenNode, IMonitorInitialize 
             @Override
             public void actionPerformed(ActionEvent e) {
                 play.set(!play.get());
+
                 playB.setEnabled(!play.get());
+                nextNodeB.setEnabled(!play.get());
+                nextSolB.setEnabled(!play.get());
+
                 pauseB.setEnabled(play.get());
+
+                nextNode.set(false);
+                nextSol.set(false);
+
             }
         };
         playB.addActionListener(actionListener);
         pauseB.addActionListener(actionListener);
 
-        leftpanel.add(flushB);
-        flushB.setEnabled(true);
-        flushB.addActionListener(new ActionListener() {
+        leftpanel.add(nextSolB);
+        nextSolB.setEnabled(true);
+        nextSolB.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                for (APanel panel : panels) {
-                    panel.flushData();
-                }
+                nextSol.set(true);
+
+                pauseB.setEnabled(true);
+
+                playB.setEnabled(false);
+                nextSolB.setEnabled(false);
+                nextNodeB.setEnabled(false);
+            }
+        });
+
+        leftpanel.add(nextNodeB);
+        nextSolB.setEnabled(true);
+        nextNodeB.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                nextNode.set(true);
+
+                pauseB.setEnabled(true);
+
+                playB.setEnabled(false);
+                nextSolB.setEnabled(false);
+                nextNodeB.setEnabled(false);
+            }
+        });
+
+
+        leftpanel.add(flushallB);
+        flushallB.setEnabled(true);
+        flushallB.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                parameters.flushNow();
             }
         });
 
@@ -136,6 +179,7 @@ public class GUI extends JFrame implements IMonitorOpenNode, IMonitorInitialize 
         statistics[FAI].setText(pad(solver.getMeasures().getFailCount() + " fails"));
         statistics[BCK].setText(pad(solver.getMeasures().getBackTrackCount() + " bcks"));
         statistics[NOD].setText(pad(solver.getMeasures().getNodeCount() + " nodes"));
+        statistics[RES].setText(pad(solver.getMeasures().getRestartCount() + " restarts"));
         statistics[TIM].setText(pad(String.format("%.1f s.", solver.getMeasures().getTimeCount())));
         statistics[NpS].setText(pad(String.format("%.2f n/s", solver.getMeasures().getNodeCount() / solver.getMeasures().getTimeCount())));
         solver.getMeasures().updateTimeCount(); // to deal with the first print
@@ -145,40 +189,45 @@ public class GUI extends JFrame implements IMonitorOpenNode, IMonitorInitialize 
         return StringUtils.pad(txt, -20, " ");
     }
 
+    public Solver getSolver() {
+        return solver;
+    }
+
+    private void refreshButtons() {
+        playB.setEnabled(!play.get());
+        pauseB.setEnabled(play.get());
+        nextNodeB.setEnabled(!play.get());
+        nextSolB.setEnabled(!play.get());
+    }
+
+    @Override
+    public void beforeInitialize() {
+        parameters.plug(tabbedpanel);
+        while (!play.get() && !nextNode.get() && !nextSol.get()) ;
+        refreshButtons();
+    }
+
+    @Override
+    public void afterInitialize() {
+    }
+
     @Override
     public void beforeOpenNode() {
-        while (!play.get()) ;
+        while (!play.get() && !nextNode.get() && !nextSol.get()) ;
         printStatistics();
+        nextNode.set(false);
+        refreshButtons();
     }
+
 
     @Override
     public void afterOpenNode() {
     }
 
-    public Solver getSolver() {
-        return solver;
-    }
-
-    public AtomicBoolean getSampling() {
-        return sampling;
-    }
-
     @Override
-    public void beforeInitialize() {
-//        panels.add(new LogDomSizePanel(this));
-        panels.add(new FreeVarsPanel(this));
-        panels.add(new DepthPanel(this));
-        panels.add(new ObjectivePanel(this));
-        for (APanel panel : panels) {
-            panel.plug(tabbedpanel);
-        }
-        while (!play.get()) ;
-
-    }
-
-    @Override
-    public void afterInitialize() {
-
+    public void onSolution() {
+        nextSol.set(false);
+        refreshButtons();
     }
 
     public boolean canUpdate() {

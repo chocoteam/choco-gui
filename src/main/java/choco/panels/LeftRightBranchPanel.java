@@ -31,8 +31,9 @@ import org.jfree.chart.ChartFactory;
 import org.jfree.chart.JFreeChart;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
+import solver.search.loop.monitors.IMonitorDownBranch;
 import solver.search.loop.monitors.IMonitorOpenNode;
-import solver.variables.IntVar;
+import solver.search.loop.monitors.IMonitorRestart;
 
 import javax.swing.*;
 
@@ -42,52 +43,89 @@ import javax.swing.*;
  * @author Charles Prud'homme
  * @since 05/06/2014
  */
-public class LogDomSizePanel extends APanel implements IMonitorOpenNode {
-    XYSeries series;
+public class LeftRightBranchPanel extends APanel implements IMonitorDownBranch, IMonitorRestart, IMonitorOpenNode {
+    XYSeries serie1, serie2;
+    int counter;
 
-    public LogDomSizePanel(GUI frame) {
+    public LeftRightBranchPanel(GUI frame) {
         super(frame);
-    }
-
-    @Override
-    public void plug(JTabbedPane tabbedpanel) {
-        series = new XYSeries("Log. dom. size");
+        serie1 = new XYSeries("Left-Right decisions");
+        serie2 = new XYSeries("Depth");
         XYSeriesCollection scoll = new XYSeriesCollection();
-        scoll.addSeries(series);
+        scoll.addSeries(serie1);
+        scoll.addSeries(serie2);
         JFreeChart chart = ChartFactory.createXYLineChart(
-                "Log. Dom. Size", "Nodes", "log(dom.size)", scoll);
+                "LR decisions", "Nodes", "Left-Right decisions", scoll);
         this.setChart(chart);
-
-        tabbedpanel.addTab("log(dom.size)", this);
         solver.plugMonitor(this);
     }
 
     @Override
-    public void unplug() {
-        //solver.unplugMonitor(this);
-        this.setVisible(false);
+    public void plug(JTabbedPane tabbedpanel) {
+        super.plug(tabbedpanel);
+        tabbedpanel.addTab("LR decisions", this);
+    }
+
+
+    @Override
+    public void beforeDownLeftBranch() {
+
     }
 
     @Override
-    public void beforeOpenNode() {
-    }
-
-    @Override
-    public void afterOpenNode() {
-        if (frame.canUpdate()) {
-            series.add(solver.getMeasures().getNodeCount(), logdomsizIt());
+    public void afterDownLeftBranch() {
+        counter++;
+        if (frame.canUpdate() && activate) {
+            serie1.add(solver.getMeasures().getNodeCount(), counter);
         }
-        if(flush){
-            series.clear();
+        if (flush) {
+            serie1.clear();
             flushDone();
         }
     }
 
-    private double logdomsizIt() {
-        double lds = 0.0;
-        for (int i = 0; i < solver.getNbVars(); i++) {
-            lds += Math.log(((IntVar) solver.getVar(i)).getDomainSize());
+    @Override
+    public void beforeDownRightBranch() {
+
+    }
+
+    @Override
+    public void afterDownRightBranch() {
+        counter--;
+        if (frame.canUpdate() && activate) {
+            serie1.add(solver.getMeasures().getNodeCount(), counter);
         }
-        return lds;
+        if (flush) {
+            serie1.clear();
+            serie2.clear();
+            flushDone();
+        }
+    }
+
+    @Override
+    public void beforeRestart() {
+        counter = 0;
+    }
+
+    @Override
+    public void afterRestart() {
+
+    }
+
+    @Override
+    public void beforeOpenNode() {
+        if (frame.canUpdate() && activate) {
+            serie2.add(solver.getMeasures().getNodeCount(), solver.getMeasures().getCurrentDepth());
+        }
+        if (flush) {
+            serie1.clear();
+            serie2.clear();
+            flushDone();
+        }
+    }
+
+    @Override
+    public void afterOpenNode() {
+
     }
 }
