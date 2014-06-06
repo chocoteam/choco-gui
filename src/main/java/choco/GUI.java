@@ -39,6 +39,7 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * <br/>
@@ -49,9 +50,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public class GUI extends JFrame implements IMonitorOpenNode, IMonitorInitialize, IMonitorSolution {
 
     Solver solver;
-    public static int DEFAULT_NODE_WAIT = 1000;
     Parameters parameters;
-
 
     // SWING
     JTabbedPane tabbedpanel = new JTabbedPane();
@@ -66,8 +65,9 @@ public class GUI extends JFrame implements IMonitorOpenNode, IMonitorInitialize,
     AtomicBoolean nextSol = new AtomicBoolean(false);
     AtomicBoolean nextNode = new AtomicBoolean(false);
 
-    JCheckBox samplingCB = new JCheckBox("Sampling");
-    AtomicBoolean sampling = new AtomicBoolean(false);
+    String[] frequency = new String[]{"1", "10", "100", "1000", "10000"};
+    JComboBox refreshCB = new JComboBox(frequency);
+    AtomicInteger node_wait = new AtomicInteger(1);
     JPanel leftpanel = new JPanel(new VerticalLayout());
     JLabel[] statistics = new JLabel[10];
 
@@ -154,13 +154,24 @@ public class GUI extends JFrame implements IMonitorOpenNode, IMonitorInitialize,
             }
         });
 
-        leftpanel.add(samplingCB);
+        /*leftpanel.add(samplingCB);
         samplingCB.setEnabled(true);
         samplingCB.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 sampling.set(!sampling.get());
                 samplingCB.setSelected(sampling.get());
+            }
+        });*/
+        leftpanel.add(new JLabel("Refresh freq. (p. node)"));
+        leftpanel.add(refreshCB);
+        refreshCB.setEnabled(true);
+        refreshCB.setSelectedIndex(0);
+        refreshCB.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                String freq = frequency[refreshCB.getSelectedIndex()];
+                node_wait.set(Integer.parseInt(freq));
             }
         });
         for (int i = 0; i < statistics.length; i++) {
@@ -231,7 +242,6 @@ public class GUI extends JFrame implements IMonitorOpenNode, IMonitorInitialize,
     }
 
     public boolean canUpdate() {
-        return (!sampling.get() ||
-                ((solver.getMeasures().getNodeCount() % GUI.DEFAULT_NODE_WAIT) == 0));
+        return ((solver.getMeasures().getNodeCount() % node_wait.get()) == 0);
     }
 }
