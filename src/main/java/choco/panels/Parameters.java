@@ -73,7 +73,7 @@ public class Parameters extends APanel {
 
         if (!((ObjectivePanel) panels.get(2)).isOpt) {
             tpanels.get(2).setEnabled(false);
-            tabbedpanel.setEnabledAt(2, false);
+            panels.get(2).unplug(tabbedpanel);
         }
 
         tabbedpanel.addTab("Parameters", this);
