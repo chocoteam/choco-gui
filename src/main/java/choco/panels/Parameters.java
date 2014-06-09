@@ -67,6 +67,9 @@ public class Parameters extends APanel {
         panels.add(new ColorVariablesPanel(frame));
         tpanels.add(addCheckbox("Domain state", 4, tabbedpanel));
 
+        panels.add(new BinaryTreePanel(frame));
+        tpanels.add(addCheckbox("Tree", 5, tabbedpanel));
+
         for (APanel panel : panels) {
             panel.plug(tabbedpanel);
         }
