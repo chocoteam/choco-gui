@@ -3,21 +3,21 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>choco</groupId>
-    <artifactId>GUI</artifactId>
+    <artifactId>choco-gui</artifactId>
     <version>3.2.1-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <name>A GUI for Choco3</name>
-    <url>https://github.com/chocoteam/GUI</url>
+    <url>https://github.com/chocoteam/choco-gui</url>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
     <scm>
-        <connection>scm:git:git@github.com:chocoteam/GUI.git</connection>
-        <url>scm:git:git://github.com/chocoteam/GUI</url>
-        <developerConnection>scm:git:git@github.com:chocoteam/GUI.git</developerConnection>
+        <connection>scm:git:git@github.com:chocoteam/choco-gui.git</connection>
+        <url>scm:git:git://github.com/chocoteam/choco-gui</url>
+        <developerConnection>scm:git:git@github.com:chocoteam/choco-gui.git</developerConnection>
         <tag>HEAD</tag>
     </scm>
     <dependencies>
