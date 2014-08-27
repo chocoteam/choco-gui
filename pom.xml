@@ -3,21 +3,21 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>choco</groupId>
-    <artifactId>choco-GUI</artifactId>
+    <artifactId>GUI</artifactId>
     <version>1.0-SNAPSHOT</version>
     <packaging>jar</packaging>
 
-    <name>choco-GUI</name>
-    <url>http://maven.apache.org</url>
+    <name>A GUI for Choco3</name>
+        <url>https://github.com/chocoteam/GUI</url>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
     <scm>
-        <connection>scm:git:git@github.com:cprudhom/choco-GUI.git</connection>
-        <url>scm:git:git://github.com/cprudhom/choco-GUI</url>
-        <developerConnection>scm:git:git@github.com:cprudhom/choco-GUI.git</developerConnection>
+        <connection>scm:git:git@github.com:chocoteam/GUI.git</connection>
+        <url>scm:git:git://github.com/chocoteam/GUI</url>
+        <developerConnection>scm:git:git@github.com:chocoteam/GUI.git</developerConnection>
         <tag>HEAD</tag>
     </scm>
     <dependencies>
@@ -39,15 +39,25 @@
             <version>1.0.17</version>
         </dependency>
     </dependencies>
+    
+    <distributionManagement>
+        <repository>
+            <uniqueVersion>false</uniqueVersion>
+            <id>choco-releases</id>
+            <name>Private Maven Repository</name>
+            <url>file:///Volumes/choco-repo/publish/mvn/repository</url>
+            <layout>default</layout>
+        </repository>
+        <snapshotRepository>
+            <uniqueVersion>true</uniqueVersion>
+            <id>choco-releases</id>
+            <name>Private Maven Repository</name>
+            <url>file:///Volumes/choco-repo/publish/mvn/repository</url>
+            <layout>default</layout>
+        </snapshotRepository>
+    </distributionManagement>
+    
     <repositories>
-        <repository>
-            <id>central.repos</id>
-            <url>http://repo1.maven.org/maven2/</url>
-        </repository>
-        <repository>
-            <id>download.java.net.repos</id>
-            <url>http://download.java.net/maven/2/</url>
-        </repository>
         <repository>
             <id>choco.repo</id>
             <url>http://www.emn.fr/z-info/choco-repo/mvn/repository/</url>
