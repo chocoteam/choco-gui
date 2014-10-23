@@ -1,4 +1,4 @@
-GUI
+choco-gui
 =========
 
 GUI is an extension for Choco3.
