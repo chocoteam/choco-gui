@@ -13,7 +13,7 @@ function guess() {
 
 VERSION=$(getVersionToRelease)
 NEXT=$(guess $VERSION)
-TAG="choco-geost-${VERSION}"
+TAG="choco-gui-${VERSION}"
 
 git fetch
 git checkout -b release
