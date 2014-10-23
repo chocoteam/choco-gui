@@ -4,9 +4,6 @@
 choco.iws~
 *.jar
 *.DS_Store
-<<<<<<< HEAD
-=======
-target/*
 
->>>>>>> 2b87ef517c35c897ccb1efe4e67004d662d8ba1d
+target/*
 dependency-reduced-pom.xml
