@@ -4,14 +4,14 @@
 
     <groupId>org.chocosolver</groupId>
     <artifactId>choco-gui</artifactId>
-    <version>3.3.1-SNAPSHOT</version>
+    <version>3.3.0</version>
     <packaging>jar</packaging>
 
     <name>A GUI for Choco3</name>
     <url>https://github.com/chocoteam/choco-gui</url>
     <description>A Graphical User Interface to plug on Choco 3.
     </description>
-   <licenses>
+    <licenses>
         <license>
             <name>BSD 3-Clause License</name>
             <url>http://opensource.org/licenses/BSD-3-Clause</url>
@@ -72,6 +72,59 @@
             <layout>default</layout>
         </snapshotRepository>
     </distributionManagement>
+
+    <profiles>
+        <profile>
+            <id>release</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+                <property>
+                    <name>performRelease</name>
+                    <value>true</value>
+                </property>
+            </activation>
+            <build>
+                <plugins>
+                    <!-- We need the GPG Plugin to self-sign the jar files. A valid signature
+                        for the jar files is a requirement for deploying to Maven Central. -->
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-gpg-plugin</artifactId>
+                        <version>1.5</version>
+                        <executions>
+                            <execution>
+                                <id>sign-artifacts</id>
+                                <phase>verify</phase>
+                                <goals>
+                                    <goal>sign</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-javadoc-plugin</artifactId>
+                        <version>2.10.1</version>
+                        <configuration>
+                            <doctitle>${project.groupId}-${project.artifactId} ${project.version} API</doctitle>
+                            <windowtitle>${project.groupId}-${project.artifactId} ${project.version} API</windowtitle>
+                            <!--<quiet />-->
+                            <additionalparam>-Xdoclint:none</additionalparam>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <id>attach-javadocs</id>
+                                <phase>verify</phase>
+                                <goals>
+                                    <goal>jar</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 
     <build>
         <plugins>
