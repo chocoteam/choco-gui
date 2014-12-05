@@ -21,7 +21,6 @@ echo "New version is ${VERSION}"
 #Update the poms
 mvn versions:set -DnewVersion=${VERSION} -DgenerateBackupPoms=false
 git commit -m "initiate release ${VERSION}" -a
-git push origin release || exit 1
 
 echo "Start release"
 #Extract the version
@@ -65,7 +64,7 @@ git commit -m "Prepare the code for the next version" -a ||quit "Unable to commi
 git push origin develop ||quit "Unable to push to develop"
 
 #Clean
-git push origin --delete release ||quit "Unable to delete release"
+git branch --delete release ||quit "Unable to delete release"
 
 git checkout $TAG
 mvn clean install -DskipTests
