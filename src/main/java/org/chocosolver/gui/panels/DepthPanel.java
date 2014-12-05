@@ -24,16 +24,14 @@
  *  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  *  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package choco.panels;
+package org.chocosolver.gui.panels;
 
-import choco.GUI;
+import org.chocosolver.gui.GUI;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.JFreeChart;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
-import solver.ResolutionPolicy;
-import solver.search.loop.monitors.IMonitorOpenNode;
-import solver.variables.IntVar;
+import org.chocosolver.solver.search.loop.monitors.IMonitorOpenNode;
 
 import javax.swing.*;
 
@@ -43,58 +41,37 @@ import javax.swing.*;
  * @author Charles Prud'homme
  * @since 05/06/2014
  */
-public class ObjectivePanel extends APanel implements IMonitorOpenNode {
-    XYSeries objective, bounds;
-    boolean isOpt;
-    boolean isMax;
+public class DepthPanel extends APanel implements IMonitorOpenNode {
+    XYSeries depth;
 
-    public ObjectivePanel(GUI frame) {
+    public DepthPanel(GUI frame) {
         super(frame);
-        isOpt = solver.getObjectiveManager().getPolicy() != ResolutionPolicy.SATISFACTION;
-        isMax = solver.getObjectiveManager().getPolicy() == ResolutionPolicy.MAXIMIZE;
-        objective = new XYSeries("Best value");
-        bounds = new XYSeries(isMax ? "Upper bound" : "Lower bound");
-        XYSeriesCollection coll = new XYSeriesCollection();
-        coll.addSeries(objective);
-        coll.addSeries(bounds);
-
-        JFreeChart dchart = ChartFactory.createXYLineChart(
-                "Objective", "Nodes", "Objective", coll);
-
-        this.setChart(dchart);
-        if (isOpt) {
-            solver.plugMonitor(this);
-        }
+        depth = new XYSeries("Depth");
+        XYSeriesCollection scoll = new XYSeriesCollection();
+        scoll.addSeries(depth);
+        JFreeChart chart = ChartFactory.createXYLineChart(
+                "Depth", "Nodes", "Depth", scoll);
+        this.setChart(chart);
+        solver.plugMonitor(this);
     }
 
     @Override
     public void plug(JTabbedPane tabbedpanel) {
         super.plug(tabbedpanel);
-        if (isOpt) {
-            tabbedpanel.addTab("Objective", this);
-        }
+        tabbedpanel.addTab("Depth", this);
     }
 
     @Override
     public void beforeOpenNode() {
-
     }
 
     @Override
     public void afterOpenNode() {
-        if (frame.canUpdate() && isOpt && activate) {
-            long ncount = solver.getMeasures().getNodeCount();
-            if (solver.getMeasures().getSolutionCount() > 0) {
-                objective.add(ncount, solver.getObjectiveManager().getBestSolutionValue());
-            }
-            bounds.add(ncount, isMax ?
-                    ((IntVar) solver.getObjectiveManager().getObjective()).getUB() :
-                    ((IntVar) solver.getObjectiveManager().getObjective()).getLB()
-            );
+        if (frame.canUpdate() && activate) {
+            depth.add(solver.getMeasures().getNodeCount(), solver.getMeasures().getCurrentDepth());
         }
         if (flush) {
-            objective.clear();
-            bounds.clear();
+            depth.clear();
             flushDone();
         }
     }

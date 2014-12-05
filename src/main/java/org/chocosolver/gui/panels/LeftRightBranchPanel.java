@@ -24,16 +24,16 @@
  *  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  *  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package choco.panels;
+package org.chocosolver.gui.panels;
 
-import choco.GUI;
+import org.chocosolver.gui.GUI;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.JFreeChart;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
-import solver.search.loop.monitors.IMonitorDownBranch;
-import solver.search.loop.monitors.IMonitorOpenNode;
-import solver.search.loop.monitors.IMonitorRestart;
+import org.chocosolver.solver.search.loop.monitors.IMonitorDownBranch;
+import org.chocosolver.solver.search.loop.monitors.IMonitorOpenNode;
+import org.chocosolver.solver.search.loop.monitors.IMonitorRestart;
 
 import javax.swing.*;
 

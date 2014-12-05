@@ -17,6 +17,8 @@ TAG="choco-gui-${VERSION}"
 git fetch
 git checkout -b release || exit 1
 
+mvn -q dependency:purge-local-repository
+
 echo "New version is ${VERSION}"
 #Update the poms
 mvn versions:set -DnewVersion=${VERSION} -DgenerateBackupPoms=false

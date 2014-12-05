@@ -24,9 +24,9 @@
  *  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  *  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package choco.panels;
+package org.chocosolver.gui.panels;
 
-import choco.GUI;
+import org.chocosolver.gui.GUI;
 
 import javax.swing.*;
 import java.awt.event.ItemEvent;

@@ -24,15 +24,15 @@
  *  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  *  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package choco;
+package org.chocosolver.gui;
 
-import choco.panels.Parameters;
+import org.chocosolver.gui.panels.Parameters;
 import org.jfree.ui.tabbedui.VerticalLayout;
-import solver.Solver;
-import solver.search.loop.monitors.IMonitorInitialize;
-import solver.search.loop.monitors.IMonitorOpenNode;
-import solver.search.loop.monitors.IMonitorSolution;
-import util.tools.StringUtils;
+import org.chocosolver.solver.Solver;
+import org.chocosolver.solver.search.loop.monitors.IMonitorInitialize;
+import org.chocosolver.solver.search.loop.monitors.IMonitorOpenNode;
+import org.chocosolver.solver.search.loop.monitors.IMonitorSolution;
+import org.chocosolver.util.tools.StringUtils;
 
 import javax.swing.*;
 import java.awt.*;

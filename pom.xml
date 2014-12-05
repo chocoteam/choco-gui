@@ -42,7 +42,7 @@
 
     <dependencies>
         <dependency>
-            <groupId>org.chocosolver</groupId>
+            <groupId>org.choco-solver</groupId>
             <artifactId>choco-solver</artifactId>
             <version>3.3.0</version>
             <scope>compile</scope>
@@ -56,7 +56,7 @@
         <dependency>
             <groupId>org.jfree</groupId>
             <artifactId>jfreechart</artifactId>
-            <version>1.0.19</version>
+            <version>1.0.17</version>
         </dependency>
     </dependencies>
 

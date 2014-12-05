@@ -24,11 +24,14 @@
  *  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  *  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package choco.panels;
+package org.chocosolver.gui.panels;
 
-import choco.GUI;
-import org.jfree.chart.ChartPanel;
-import solver.Solver;
+import org.chocosolver.gui.GUI;
+import org.jfree.chart.ChartFactory;
+import org.jfree.chart.JFreeChart;
+import org.jfree.data.xy.XYSeries;
+import org.jfree.data.xy.XYSeriesCollection;
+import org.chocosolver.solver.search.loop.monitors.IMonitorOpenNode;
 
 import javax.swing.*;
 
@@ -38,33 +41,47 @@ import javax.swing.*;
  * @author Charles Prud'homme
  * @since 05/06/2014
  */
-public abstract class APanel extends ChartPanel {
+public class FreeVarsPanel extends APanel implements IMonitorOpenNode {
+    XYSeries series;
 
-    Solver solver;
-    GUI frame;
-    boolean flush;
-    boolean activate;
-
-    public APanel(GUI frame) {
-        super(null);
-        this.frame = frame;
-        this.solver = frame.getSolver();
+    public FreeVarsPanel(GUI frame) {
+        super(frame);
+        series = new XYSeries("Free variables");
+        XYSeriesCollection scoll = new XYSeriesCollection();
+        scoll.addSeries(series);
+        JFreeChart chart = ChartFactory.createXYLineChart(
+                "Free variables", "Nodes", "free vars", scoll);
+        this.setChart(chart);
+        solver.plugMonitor(this);
     }
 
-    public void plug(JTabbedPane tabbedpanel){
-        activate = true;
+    @Override
+    public void plug(JTabbedPane tabbedpanel) {
+        super.plug(tabbedpanel);
+        tabbedpanel.addTab("free vars", this);
     }
 
-    public void unplug(JTabbedPane tabbedpanel) {
-        tabbedpanel.remove(this);
-        activate = false;
+
+    @Override
+    public void beforeOpenNode() {
     }
 
-    public final void flushData() {
-        flush = true;
+    @Override
+    public void afterOpenNode() {
+        if (frame.canUpdate() && activate) {
+            series.add(solver.getMeasures().getNodeCount(), compute());
+        }
+        if (flush) {
+            series.clear();
+            flushDone();
+        }
     }
 
-    protected final void flushDone() {
-        flush = false;
+    private double compute() {
+        double lds = 0.0;
+        for (int i = 0; i < solver.getNbVars(); i++) {
+            lds += solver.getVar(i).isInstantiated() ? 1 : 0;
+        }
+        return solver.getNbVars() - lds;
     }
 }
