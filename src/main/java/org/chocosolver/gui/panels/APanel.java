@@ -24,14 +24,11 @@
  *  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  *  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package choco.panels;
+package org.chocosolver.gui.panels;
 
-import choco.GUI;
-import org.jfree.chart.ChartFactory;
-import org.jfree.chart.JFreeChart;
-import org.jfree.data.xy.XYSeries;
-import org.jfree.data.xy.XYSeriesCollection;
-import solver.search.loop.monitors.IMonitorOpenNode;
+import org.chocosolver.gui.GUI;
+import org.jfree.chart.ChartPanel;
+import org.chocosolver.solver.Solver;
 
 import javax.swing.*;
 
@@ -41,38 +38,33 @@ import javax.swing.*;
  * @author Charles Prud'homme
  * @since 05/06/2014
  */
-public class DepthPanel extends APanel implements IMonitorOpenNode {
-    XYSeries depth;
+public abstract class APanel extends ChartPanel {
 
-    public DepthPanel(GUI frame) {
-        super(frame);
-        depth = new XYSeries("Depth");
-        XYSeriesCollection scoll = new XYSeriesCollection();
-        scoll.addSeries(depth);
-        JFreeChart chart = ChartFactory.createXYLineChart(
-                "Depth", "Nodes", "Depth", scoll);
-        this.setChart(chart);
-        solver.plugMonitor(this);
+    Solver solver;
+    GUI frame;
+    boolean flush;
+    boolean activate;
+
+    public APanel(GUI frame) {
+        super(null);
+        this.frame = frame;
+        this.solver = frame.getSolver();
     }
 
-    @Override
-    public void plug(JTabbedPane tabbedpanel) {
-        super.plug(tabbedpanel);
-        tabbedpanel.addTab("Depth", this);
+    public void plug(JTabbedPane tabbedpanel){
+        activate = true;
     }
 
-    @Override
-    public void beforeOpenNode() {
+    public void unplug(JTabbedPane tabbedpanel) {
+        tabbedpanel.remove(this);
+        activate = false;
     }
 
-    @Override
-    public void afterOpenNode() {
-        if (frame.canUpdate() && activate) {
-            depth.add(solver.getMeasures().getNodeCount(), solver.getMeasures().getCurrentDepth());
-        }
-        if (flush) {
-            depth.clear();
-            flushDone();
-        }
+    public final void flushData() {
+        flush = true;
+    }
+
+    protected final void flushDone() {
+        flush = false;
     }
 }

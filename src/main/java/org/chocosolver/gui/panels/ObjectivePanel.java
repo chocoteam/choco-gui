@@ -24,14 +24,18 @@
  *  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  *  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package choco.panels;
+package org.chocosolver.gui.panels;
 
-import choco.GUI;
-import solver.search.loop.monitors.IMonitorOpenNode;
+import org.chocosolver.gui.GUI;
+import org.jfree.chart.ChartFactory;
+import org.jfree.chart.JFreeChart;
+import org.jfree.data.xy.XYSeries;
+import org.jfree.data.xy.XYSeriesCollection;
+import org.chocosolver.solver.ResolutionPolicy;
+import org.chocosolver.solver.search.loop.monitors.IMonitorOpenNode;
+import org.chocosolver.solver.variables.IntVar;
 
 import javax.swing.*;
-import java.awt.*;
-import java.awt.image.BufferedImage;
 
 /**
  * <br/>
@@ -39,56 +43,59 @@ import java.awt.image.BufferedImage;
  * @author Charles Prud'homme
  * @since 05/06/2014
  */
-public class ColorVariablesPanel extends APanel implements IMonitorOpenNode {
+public class ObjectivePanel extends APanel implements IMonitorOpenNode {
+    XYSeries objective, bounds;
+    boolean isOpt;
+    boolean isMax;
 
-    int size;
-    int psize = 10;
-
-    BufferedImage image;
-    JLabel theLabel;
-    ImageIcon icon;
-
-
-    public ColorVariablesPanel(GUI frame) {
+    public ObjectivePanel(GUI frame) {
         super(frame);
-        solver.plugMonitor(this);
-        size = (int) Math.ceil(Math.sqrt(solver.getNbVars()));
-        psize = 600 / size;
-        image = new BufferedImage(size * psize, size * psize, BufferedImage.TYPE_INT_ARGB);
-        solver.plugMonitor(this);
-        icon = new ImageIcon(image);
-        theLabel = new JLabel(new ImageIcon(image));
-        add(theLabel);
-    }
+        isOpt = solver.getObjectiveManager().getPolicy() != ResolutionPolicy.SATISFACTION;
+        isMax = solver.getObjectiveManager().getPolicy() == ResolutionPolicy.MAXIMIZE;
+        objective = new XYSeries("Best value");
+        bounds = new XYSeries(isMax ? "Upper bound" : "Lower bound");
+        XYSeriesCollection coll = new XYSeriesCollection();
+        coll.addSeries(objective);
+        coll.addSeries(bounds);
 
-    @Override
-    public void paintComponent(Graphics g) {
-        super.paintComponent(g);
-        for (int i = 0; i < solver.getNbVars(); i++) {
-            int x = i / size;
-            int y = i % size;
-            Color color = solver.getVar(i).isInstantiated() ? Color.GREEN : Color.BLUE;
-            for (int j = 0; j < psize; j++)
-                for (int k = 0; k < psize; k++)
-                    image.setRGB(x * psize + j, y * psize + k, color.getRGB());
+        JFreeChart dchart = ChartFactory.createXYLineChart(
+                "Objective", "Nodes", "Objective", coll);
+
+        this.setChart(dchart);
+        if (isOpt) {
+            solver.plugMonitor(this);
         }
     }
 
     @Override
     public void plug(JTabbedPane tabbedpanel) {
         super.plug(tabbedpanel);
-        tabbedpanel.addTab("Color map", this);
+        if (isOpt) {
+            tabbedpanel.addTab("Objective", this);
+        }
     }
 
     @Override
     public void beforeOpenNode() {
-    }
 
+    }
 
     @Override
     public void afterOpenNode() {
-        if (frame.canUpdate() && activate) {
-            repaint();
+        if (frame.canUpdate() && isOpt && activate) {
+            long ncount = solver.getMeasures().getNodeCount();
+            if (solver.getMeasures().getSolutionCount() > 0) {
+                objective.add(ncount, solver.getObjectiveManager().getBestSolutionValue());
+            }
+            bounds.add(ncount, isMax ?
+                    ((IntVar) solver.getObjectiveManager().getObjective()).getUB() :
+                    ((IntVar) solver.getObjectiveManager().getObjective()).getLB()
+            );
+        }
+        if (flush) {
+            objective.clear();
+            bounds.clear();
+            flushDone();
         }
     }
 }

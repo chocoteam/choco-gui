@@ -24,16 +24,14 @@
  *  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  *  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package choco.panels;
+package org.chocosolver.gui.panels;
 
-import choco.GUI;
-import org.jfree.chart.ChartFactory;
-import org.jfree.chart.JFreeChart;
-import org.jfree.data.xy.XYSeries;
-import org.jfree.data.xy.XYSeriesCollection;
-import solver.search.loop.monitors.IMonitorOpenNode;
+import org.chocosolver.gui.GUI;
+import org.chocosolver.solver.search.loop.monitors.IMonitorOpenNode;
 
 import javax.swing.*;
+import java.awt.*;
+import java.awt.image.BufferedImage;
 
 /**
  * <br/>
@@ -41,47 +39,56 @@ import javax.swing.*;
  * @author Charles Prud'homme
  * @since 05/06/2014
  */
-public class FreeVarsPanel extends APanel implements IMonitorOpenNode {
-    XYSeries series;
+public class ColorVariablesPanel extends APanel implements IMonitorOpenNode {
 
-    public FreeVarsPanel(GUI frame) {
+    int size;
+    int psize = 10;
+
+    BufferedImage image;
+    JLabel theLabel;
+    ImageIcon icon;
+
+
+    public ColorVariablesPanel(GUI frame) {
         super(frame);
-        series = new XYSeries("Free variables");
-        XYSeriesCollection scoll = new XYSeriesCollection();
-        scoll.addSeries(series);
-        JFreeChart chart = ChartFactory.createXYLineChart(
-                "Free variables", "Nodes", "free vars", scoll);
-        this.setChart(chart);
         solver.plugMonitor(this);
+        size = (int) Math.ceil(Math.sqrt(solver.getNbVars()));
+        psize = 600 / size;
+        image = new BufferedImage(size * psize, size * psize, BufferedImage.TYPE_INT_ARGB);
+        solver.plugMonitor(this);
+        icon = new ImageIcon(image);
+        theLabel = new JLabel(new ImageIcon(image));
+        add(theLabel);
+    }
+
+    @Override
+    public void paintComponent(Graphics g) {
+        super.paintComponent(g);
+        for (int i = 0; i < solver.getNbVars(); i++) {
+            int x = i / size;
+            int y = i % size;
+            Color color = solver.getVar(i).isInstantiated() ? Color.GREEN : Color.BLUE;
+            for (int j = 0; j < psize; j++)
+                for (int k = 0; k < psize; k++)
+                    image.setRGB(x * psize + j, y * psize + k, color.getRGB());
+        }
     }
 
     @Override
     public void plug(JTabbedPane tabbedpanel) {
         super.plug(tabbedpanel);
-        tabbedpanel.addTab("free vars", this);
+        tabbedpanel.addTab("Color map", this);
     }
-
 
     @Override
     public void beforeOpenNode() {
     }
 
+
     @Override
     public void afterOpenNode() {
         if (frame.canUpdate() && activate) {
-            series.add(solver.getMeasures().getNodeCount(), compute());
+            repaint();
         }
-        if (flush) {
-            series.clear();
-            flushDone();
-        }
-    }
-
-    private double compute() {
-        double lds = 0.0;
-        for (int i = 0; i < solver.getNbVars(); i++) {
-            lds += solver.getVar(i).isInstantiated() ? 1 : 0;
-        }
-        return solver.getNbVars() - lds;
     }
 }

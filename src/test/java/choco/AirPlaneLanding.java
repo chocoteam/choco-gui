@@ -28,21 +28,22 @@
 package choco;
 
 import gnu.trove.map.hash.TObjectIntHashMap;
+import org.chocosolver.gui.GUI;
 import org.kohsuke.args4j.Option;
 import org.slf4j.LoggerFactory;
-import samples.AbstractProblem;
-import solver.ResolutionPolicy;
-import solver.Solver;
-import solver.constraints.Constraint;
-import solver.constraints.IntConstraintFactory;
-import solver.constraints.LogicalConstraintFactory;
-import solver.constraints.ternary.Max;
-import solver.search.loop.monitors.SMF;
-import solver.search.strategy.IntStrategyFactory;
-import solver.variables.BoolVar;
-import solver.variables.IntVar;
-import solver.variables.VariableFactory;
-import util.ESat;
+import org.chocosolver.samples.AbstractProblem;
+import org.chocosolver.solver.ResolutionPolicy;
+import org.chocosolver.solver.Solver;
+import org.chocosolver.solver.constraints.Constraint;
+import org.chocosolver.solver.constraints.IntConstraintFactory;
+import org.chocosolver.solver.constraints.LogicalConstraintFactory;
+import org.chocosolver.solver.constraints.ternary.Max;
+import org.chocosolver.solver.search.loop.monitors.SMF;
+import org.chocosolver.solver.search.strategy.IntStrategyFactory;
+import org.chocosolver.solver.variables.BoolVar;
+import org.chocosolver.solver.variables.IntVar;
+import org.chocosolver.solver.variables.VariableFactory;
+import org.chocosolver.util.ESat;
 
 import java.util.*;
 import java.util.regex.Pattern;
@@ -146,8 +147,7 @@ public class AirPlaneLanding extends AbstractProblem {
 
                 Constraint c1 = precedence(planes[i], data[i][ST + j], planes[j]);
                 Constraint c2 = precedence(planes[j], data[j][ST + i], planes[i]);
-                Constraint cr = LogicalConstraintFactory.ifThenElse(boolVar, c1, c2);
-                solver.post(cr);
+                LogicalConstraintFactory.ifThenElse(boolVar, c1, c2);
             }
         }
 

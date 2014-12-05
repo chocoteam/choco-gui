@@ -24,12 +24,12 @@
  *  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  *  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package choco.panels;
+package org.chocosolver.gui.panels;
 
-import choco.GUI;
-import solver.search.loop.monitors.IMonitorDownBranch;
-import solver.search.loop.monitors.IMonitorRestart;
-import solver.search.loop.monitors.IMonitorUpBranch;
+import org.chocosolver.gui.GUI;
+import org.chocosolver.solver.search.loop.monitors.IMonitorDownBranch;
+import org.chocosolver.solver.search.loop.monitors.IMonitorRestart;
+import org.chocosolver.solver.search.loop.monitors.IMonitorUpBranch;
 
 import javax.swing.*;
 import java.awt.*;
