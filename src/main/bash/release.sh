@@ -40,7 +40,7 @@ git fetch origin master:refs/remotes/origin/master||quit "Unable to fetch master
 echo "** Integrate to master **"
 git checkout master ||quit "No master branch"
 git pull origin master || quit "Unable to pull master"
-git merge --no-ff ${COMMIT} ||quit "Unable to integrate to master"
+git merge --no-ff --log ${COMMIT} ||quit "Unable to integrate to master"
 
 #NOT USED FOR THE MOMENT
 ##Javadoc
@@ -58,7 +58,7 @@ mvn -P release clean javadoc:jar source:jar deploy -DskipTests ||quit "Unable to
 #echo "** Prepare develop for the next version **"
 git checkout develop ||quit "Unable to checkout develop"
 git pull origin develop ||quit "Unable to pull develop"
-git merge --no-ff ${TAG} ||quit "Unable to integrate to develop"
+git merge --no-ff --log  ${TAG} ||quit "Unable to integrate to develop"
 mvn versions:set -DnewVersion=${NEXT} -DgenerateBackupPoms=false
 git commit -m "Prepare the code for the next version" -a ||quit "Unable to commit to develop"
 #
