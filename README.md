@@ -15,3 +15,13 @@ Then, before solving a problme, add GUI as a new monitor:
 
 
 This extension is a work-in-progress project, so any suggestions or contributions are welcome.
+
+Available on MCR:
+
+``` xml
+<dependency>
+   <groupId>org.choco-solver</groupId>
+   <artifactId>choco-gui</artifactId>
+   <version>3.3.0</version>
+</dependency>
+```
