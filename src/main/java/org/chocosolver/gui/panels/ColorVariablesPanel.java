@@ -52,7 +52,7 @@ public class ColorVariablesPanel extends APanel implements IMonitorOpenNode {
     public ColorVariablesPanel(GUI frame) {
         super(frame);
         solver.plugMonitor(this);
-        size = (int) Math.ceil(Math.sqrt(solver.getNbVars()));
+        size = (int) Math.ceil(Math.sqrt(model.getNbVars()));
         psize = 600 / size;
         image = new BufferedImage(size * psize, size * psize, BufferedImage.TYPE_INT_ARGB);
         solver.plugMonitor(this);
@@ -64,10 +64,10 @@ public class ColorVariablesPanel extends APanel implements IMonitorOpenNode {
     @Override
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
-        for (int i = 0; i < solver.getNbVars(); i++) {
+        for (int i = 0; i < model.getNbVars(); i++) {
             int x = i / size;
             int y = i % size;
-            Color color = solver.getVar(i).isInstantiated() ? Color.GREEN : Color.BLUE;
+            Color color = model.getVar(i).isInstantiated() ? Color.GREEN : Color.BLUE;
             for (int j = 0; j < psize; j++)
                 for (int k = 0; k < psize; k++)
                     image.setRGB(x * psize + j, y * psize + k, color.getRGB());

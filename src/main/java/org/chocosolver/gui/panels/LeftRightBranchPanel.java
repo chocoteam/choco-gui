@@ -68,36 +68,23 @@ public class LeftRightBranchPanel extends APanel implements IMonitorDownBranch, 
 
 
     @Override
-    public void beforeDownLeftBranch() {
+    public void beforeDownBranch(boolean left) {
 
     }
 
     @Override
-    public void afterDownLeftBranch() {
-        counter++;
+    public void afterDownBranch(boolean left) {
+        if(left){
+            counter++;
+        } else {
+            counter--;
+        }
         if (frame.canUpdate() && activate) {
             serie1.add(solver.getMeasures().getNodeCount(), counter);
         }
         if (flush) {
             serie1.clear();
-            flushDone();
-        }
-    }
-
-    @Override
-    public void beforeDownRightBranch() {
-
-    }
-
-    @Override
-    public void afterDownRightBranch() {
-        counter--;
-        if (frame.canUpdate() && activate) {
-            serie1.add(solver.getMeasures().getNodeCount(), counter);
-        }
-        if (flush) {
-            serie1.clear();
-            serie2.clear();
+            if (!left) serie2.clear();
             flushDone();
         }
     }

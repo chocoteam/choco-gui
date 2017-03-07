@@ -79,9 +79,9 @@ public class FreeVarsPanel extends APanel implements IMonitorOpenNode {
 
     private double compute() {
         double lds = 0.0;
-        for (int i = 0; i < solver.getNbVars(); i++) {
-            lds += solver.getVar(i).isInstantiated() ? 1 : 0;
+        for (int i = 0; i < model.getNbVars(); i++) {
+            lds += model.getVar(i).isInstantiated() ? 1 : 0;
         }
-        return solver.getNbVars() - lds;
+        return model.getNbVars() - lds;
     }
 }
