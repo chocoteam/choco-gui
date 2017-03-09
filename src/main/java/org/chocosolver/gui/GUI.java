@@ -27,6 +27,7 @@
 package org.chocosolver.gui;
 
 import org.chocosolver.gui.panels.Parameters;
+import org.chocosolver.solver.Model;
 import org.jfree.ui.tabbedui.VerticalLayout;
 import org.chocosolver.solver.Solver;
 import org.chocosolver.solver.search.loop.monitors.IMonitorInitialize;
@@ -49,6 +50,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 public class GUI extends JFrame implements IMonitorOpenNode, IMonitorInitialize, IMonitorSolution {
 
+    Model model;
     Solver solver;
     Parameters parameters;
 
@@ -76,6 +78,7 @@ public class GUI extends JFrame implements IMonitorOpenNode, IMonitorInitialize,
 
     public GUI(Solver solver) {
         this.solver = solver;
+        this.model = solver.getModel();
         init();
     }
 
@@ -184,8 +187,8 @@ public class GUI extends JFrame implements IMonitorOpenNode, IMonitorInitialize,
     }
 
     private void printStatistics() {
-        statistics[VAR].setText(pad(solver.getNbVars() + " vars"));
-        statistics[CSTR].setText(pad(solver.getNbCstrs() + " cstrs"));
+        statistics[VAR].setText(pad(model.getNbVars() + " vars"));
+        statistics[CSTR].setText(pad(model.getNbCstrs() + " cstrs"));
         statistics[SOL].setText(pad(solver.getMeasures().getSolutionCount() + " sols"));
         statistics[FAI].setText(pad(solver.getMeasures().getFailCount() + " fails"));
         statistics[BCK].setText(pad(solver.getMeasures().getBackTrackCount() + " bcks"));
@@ -193,7 +196,7 @@ public class GUI extends JFrame implements IMonitorOpenNode, IMonitorInitialize,
         statistics[RES].setText(pad(solver.getMeasures().getRestartCount() + " restarts"));
         statistics[TIM].setText(pad(String.format("%.1f s.", solver.getMeasures().getTimeCount())));
         statistics[NpS].setText(pad(String.format("%.2f n/s", solver.getMeasures().getNodeCount() / solver.getMeasures().getTimeCount())));
-        solver.getMeasures().updateTimeCount(); // to deal with the first print
+        //solver.getMeasures().updateTimeCount(); // to deal with the first print
     }
 
     private static String pad(String txt) {
@@ -202,6 +205,10 @@ public class GUI extends JFrame implements IMonitorOpenNode, IMonitorInitialize,
 
     public Solver getSolver() {
         return solver;
+    }
+
+    public Model getModel() {
+        return model;
     }
 
     private void refreshButtons() {

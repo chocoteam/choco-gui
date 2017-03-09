@@ -26,16 +26,15 @@
  */
 package choco;
 
-import org.kohsuke.args4j.Option;
-import org.slf4j.LoggerFactory;
-import org.chocosolver.samples.AbstractProblem;
+import org.chocosolver.gui.GUI;
+import org.chocosolver.solver.Model;
+import org.chocosolver.solver.search.strategy.Search;
 import org.chocosolver.solver.Solver;
 import org.chocosolver.solver.constraints.Constraint;
-import org.chocosolver.solver.constraints.IntConstraintFactory;
-import org.chocosolver.solver.search.strategy.IntStrategyFactory;
 import org.chocosolver.solver.variables.IntVar;
-import org.chocosolver.solver.variables.VariableFactory;
-import org.chocosolver.util.tools.StringUtils;
+
+import java.util.UUID;
+import java.util.logging.Logger;
 
 /**
  * CSPLib prob007:<br/>
@@ -52,11 +51,11 @@ import org.chocosolver.util.tools.StringUtils;
  * @author Charles Prud'homme
  * @since 02/08/11
  */
-public class AllIntervalSeries extends AbstractProblem {
-    @Option(name = "-o", usage = "All interval series size.", required = false)
+public class AllIntervalSeries {
+    //@Option(name = "-o", usage = "All interval series size.", required = false)
     private int m = 1000;
 
-    @Option(name = "-v", usage = " use views instead of constraints.", required = false)
+    //@Option(name = "-v", usage = " use views instead of constraints.", required = false)
     private boolean use_views = false;
 
     IntVar[] vars;
@@ -65,55 +64,62 @@ public class AllIntervalSeries extends AbstractProblem {
     Constraint[] ALLDIFF;
     Constraint[] OTHERS;
 
-    @Override
-    public void createSolver() {
-        solver = new Solver("AllIntervalSeries");
+    Model model;
+    Solver solver;
+
+    public void createModel() {
+        model = new Model("AllIntervalSeries");
     }
 
-    @Override
+
     public void buildModel() {
-        vars = VariableFactory.enumeratedArray("v", m, 0, m - 1, solver);
+        vars = model.intVarArray("v", m, 0, m-1, false);
         dist = new IntVar[m - 1];
 
         if (!use_views) {
-            dist = VariableFactory.enumeratedArray("dist", m - 1, 1, m - 1, solver);
+            dist = model.intVarArray("dist", m-1, 1, m-1, false);
+
             for (int i = 0; i < m - 1; i++) {
-                solver.post(IntConstraintFactory.distance(vars[i + 1], vars[i], "=", dist[i]));
+                model.distance(vars[i + 1], vars[i], "=", dist[i]).post();
             }
         } else {
             for (int i = 0; i < m - 1; i++) {
-				IntVar k = VariableFactory.bounded(StringUtils.randomName(),-20000,20000,solver);
-				solver.post(IntConstraintFactory.sum(new IntVar[]{vars[i],k},vars[i+1]));
-				dist[i] = VariableFactory.abs(k);
-                solver.post(IntConstraintFactory.member(dist[i], 1, m - 1));
+                IntVar k = model.intVar(UUID.randomUUID().toString(),-20000,20000, true);
+				model.sum(new IntVar[]{vars[i],k},"=",vars[i+1]).post();
+
+				dist[i] = k.abs().intVar();
+                model.member(dist[i], 1, m - 1).post();
             }
         }
 
         ALLDIFF = new Constraint[2];
-        ALLDIFF[0] = (IntConstraintFactory.alldifferent(vars, "BC"));
-        ALLDIFF[1] = (IntConstraintFactory.alldifferent(dist, "BC"));
-        solver.post(ALLDIFF);
+        ALLDIFF[0] = (model.allDifferent(vars, "BC"));
+        ALLDIFF[1] = (model.allDifferent(dist, "BC"));
+        model.post(ALLDIFF);
 
         // break symetries
         OTHERS = new Constraint[2];
-        OTHERS[0] = (IntConstraintFactory.arithm(vars[1], ">", vars[0]));
-        OTHERS[1] = (IntConstraintFactory.arithm(dist[0], ">", dist[m - 2]));
-        solver.post(OTHERS);
+        OTHERS[0] = (model.arithm(vars[1], ">", vars[0]));
+        OTHERS[1] = (model.arithm(dist[0], ">", dist[m - 2]));
+        model.post(OTHERS);
     }
 
-    @Override
+
     public void configureSearch() {
-        solver.set(IntStrategyFactory.minDom_LB(vars));
+        solver = model.getSolver();
+        solver.plugMonitor(new GUI(solver));
+        solver.setSearch(Search.minDomLBSearch(vars));
     }
 
-    @Override
+
     public void solve() {
         solver.findSolution();
     }
 
-    @Override
+
     public void prettyOut() {
-        LoggerFactory.getLogger("bench").info("All interval series({})", m);
+//        LoggerFactory.getLogger("bench").info("All interval series({})", m);
+        Logger.getLogger("bench").info("All interval series("+m+")");
         StringBuilder st = new StringBuilder();
         st.append("\t");
         for (int i = 0; i < m - 1; i++) {
@@ -123,10 +129,19 @@ public class AllIntervalSeries extends AbstractProblem {
             }
         }
         st.append(String.format("%d", vars[m - 1].getValue()));
-        LoggerFactory.getLogger("bench").info(st.toString());
+//        LoggerFactory.getLogger("bench").info(st.toString());
+        Logger.getLogger("bench").info(st.toString());
+    }
+
+    void execute() {
+        createModel();
+        buildModel();
+        configureSearch();
+        solve();
+        prettyOut();
     }
 
     public static void main(String[] args) {
-        new AllIntervalSeries().execute(args);
+        new AllIntervalSeries().execute();
     }
 }

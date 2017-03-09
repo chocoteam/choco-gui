@@ -27,6 +27,7 @@
 package org.chocosolver.gui.panels;
 
 import org.chocosolver.gui.GUI;
+import org.chocosolver.solver.Model;
 import org.jfree.chart.ChartPanel;
 import org.chocosolver.solver.Solver;
 
@@ -41,6 +42,7 @@ import javax.swing.*;
 public abstract class APanel extends ChartPanel {
 
     Solver solver;
+    Model model;
     GUI frame;
     boolean flush;
     boolean activate;
@@ -49,6 +51,7 @@ public abstract class APanel extends ChartPanel {
         super(null);
         this.frame = frame;
         this.solver = frame.getSolver();
+        this.model = frame.getModel();
     }
 
     public void plug(JTabbedPane tabbedpanel){
