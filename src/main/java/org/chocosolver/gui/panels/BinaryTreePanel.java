@@ -63,9 +63,13 @@ public class BinaryTreePanel extends APanel implements IMonitorDownBranch, IMoni
     }
 
     @Override
-    public void beforeDownLeftBranch() {
-        resize();
-        nodes[cnode++] = 1;
+    public void beforeDownBranch(boolean left) {
+        if(left) {
+            resize();
+            nodes[cnode++] = 1;
+        } else {
+            nodes[cnode++]++;
+        }
         if (frame.canUpdate() && activate) {
             repaint();
         }
@@ -75,24 +79,7 @@ public class BinaryTreePanel extends APanel implements IMonitorDownBranch, IMoni
     }
 
     @Override
-    public void afterDownLeftBranch() {
-
-    }
-
-    @Override
-    public void beforeDownRightBranch() {
-        nodes[cnode++]++;
-        if (frame.canUpdate() && activate) {
-            repaint();
-        }
-        if (flush) {
-            flushDone();
-        }
-
-    }
-
-    @Override
-    public void afterDownRightBranch() {
+    public void afterDownBranch(boolean left) {
 
     }
 

@@ -14,10 +14,10 @@
 
     <groupId>org.choco-solver</groupId>
     <artifactId>choco-gui</artifactId>
-    <version>3.3.0</version>
+    <version>4.0.2</version>
     <packaging>jar</packaging>
 
-    <name>A GUI for Choco3</name>
+    <name>A GUI for Choco4</name>
     <url>https://github.com/chocoteam/choco-gui</url>
     <description>A Graphical User Interface to plug on Choco 3.
     </description>
@@ -62,7 +62,7 @@
         <dependency>
             <groupId>org.choco-solver</groupId>
             <artifactId>choco-solver</artifactId>
-            <version>3.3.0</version>
+            <version>4.0.2</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
