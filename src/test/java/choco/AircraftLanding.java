@@ -1,6 +1,10 @@
 /**
- * Copyright (c) 2016, Ecole des Mines de Nantes
- * All rights reserved.
+ * This file is part of choco-gui, https://github.com/chocoteam/choco-gui
+ *
+ * Copyright (c) 2017, IMT Atlantique. All rights reserved.
+ *
+ * Licensed under the BSD 4-clause license.
+ * See LICENSE file in the project root for full license information.
  */
 package choco;
 
