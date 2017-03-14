@@ -9,8 +9,8 @@
 package org.chocosolver.gui.panels;
 
 import org.chocosolver.gui.GUI;
-import org.chocosolver.solver.Model;
 import org.jfree.chart.ChartPanel;
+import org.chocosolver.solver.Model;
 import org.chocosolver.solver.Solver;
 
 import javax.swing.*;

@@ -10,19 +10,20 @@ package org.chocosolver.gui;
 
 import org.chocosolver.gui.panels.Parameters;
 import org.chocosolver.solver.Model;
-import org.jfree.ui.tabbedui.VerticalLayout;
 import org.chocosolver.solver.Solver;
 import org.chocosolver.solver.search.loop.monitors.IMonitorInitialize;
 import org.chocosolver.solver.search.loop.monitors.IMonitorOpenNode;
 import org.chocosolver.solver.search.loop.monitors.IMonitorSolution;
 import org.chocosolver.util.tools.StringUtils;
+import org.jfree.ui.tabbedui.VerticalLayout;
 
-import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
+
+import javax.swing.*;
 
 /**
  * <br/>
