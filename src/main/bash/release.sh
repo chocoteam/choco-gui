@@ -5,6 +5,10 @@ function getVersionToRelease() {
     echo ${CURRENT_VERSION%%-SNAPSHOT}
 }
 
+function getChocoVersion() {
+    echo `mvn ${MVN_ARGS} org.apache.maven.plugins:maven-help-plugin:2.1.1:evaluate -Dexpression=choco.version | grep -v "\[INFO\]"`
+}
+
 function guess() {
     v=$1
     echo "${v%.*}.$((${v##*.}+1))-SNAPSHOT"
@@ -19,6 +23,7 @@ function sedInPlace() {
 }
 
 VERSION=$(getVersionToRelease)
+CHOCO_VERSION=$(getChocoVersion)
 NEXT=$(guess $VERSION)
 TAG="choco-gui-${VERSION}"
 
@@ -30,8 +35,8 @@ mvn -q dependency:purge-local-repository
 echo "New version is ${VERSION}"
 YEAR=`LANG=en_US.utf8 date +"%Y"`
 sedInPlace "s%Copyright.*.%Copyright (c) $YEAR, IMT Atlantique%"  LICENSE
-sedInPlace "s%choco-parsers-.*-with-dependencies.jar%choco-parsers-${VERSION}-with-dependencies.jar%"  README.md
-sedInPlace "s%choco-parsers-.*-with-dependencies.jar%CHOCO_JAR=/Users/cprudhom/.m2/repository/org/choco-solver/choco-parsers/${VERSION}/choco-parsers-${VERSION}-with-dependencies.jar%"  README.md
+sedInPlace "s%Simply.*.%Simply add the GUI-${VERSION}.jar file to your classpath, together with choco-solver-${CHOCO_VERSION}.jar file.%"  README.md
+sedInPlace "s%<version>.*.%   <version>${CHOCO_VERSION}</version>%" README.md
 #Update the poms:wq
 mvn versions:set -DnewVersion=${VERSION} -DgenerateBackupPoms=false
 mvn license:format
