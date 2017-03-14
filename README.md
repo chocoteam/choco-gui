@@ -7,7 +7,7 @@ It provides a Graphical User Interface with various views which can be simply pl
 Usage
 -----
 
-Simply add the GUI-4.0.2.jar file to your classpath, together with choco-solver-null object or invalid expression.jar file.
+Simply add the GUI-4.0.2.jar file to your classpath, together with choco-solver-4.0.2.jar file.
 Then, before solving a problme, add GUI as a new monitor:
 
 
@@ -22,6 +22,6 @@ Available on MCR:
 <dependency>
    <groupId>org.choco-solver</groupId>
    <artifactId>choco-gui</artifactId>
-      <version>null object or invalid expression</version>
+   <version>4.0.2</version>
 </dependency>
 ```

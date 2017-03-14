@@ -45,6 +45,7 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.build.timestamp.format>yyyy</maven.build.timestamp.format>
+        <choco.version>4.0.2</choco.version>
     </properties>
 
     <scm>
@@ -62,7 +63,7 @@
         <dependency>
             <groupId>org.choco-solver</groupId>
             <artifactId>choco-solver</artifactId>
-            <version>4.0.2</version>
+            <version>${choco.version}</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
