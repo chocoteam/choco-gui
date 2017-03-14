@@ -10,6 +10,14 @@ function guess() {
     echo "${v%.*}.$((${v##*.}+1))-SNAPSHOT"
 }
 
+function sedInPlace() {
+	if [ $(uname) = "Darwin" ]; then
+		sed -i '' "$1" $2
+	else
+		sed -i'' "$1" $2
+	fi
+}
+
 VERSION=$(getVersionToRelease)
 NEXT=$(guess $VERSION)
 TAG="choco-gui-${VERSION}"
@@ -20,8 +28,14 @@ git checkout -b release || exit 1
 mvn -q dependency:purge-local-repository
 
 echo "New version is ${VERSION}"
-#Update the poms
+YEAR=`LANG=en_US.utf8 date +"%Y"`
+sedInPlace "s%Copyright.*.%Copyright (c) $YEAR, IMT Atlantique%"  LICENSE
+sedInPlace "s%choco-parsers-.*-with-dependencies.jar%choco-parsers-${VERSION}-with-dependencies.jar%"  README.md
+sedInPlace "s%choco-parsers-.*-with-dependencies.jar%CHOCO_JAR=/Users/cprudhom/.m2/repository/org/choco-solver/choco-parsers/${VERSION}/choco-parsers-${VERSION}-with-dependencies.jar%"  README.md
+#Update the poms:wq
 mvn versions:set -DnewVersion=${VERSION} -DgenerateBackupPoms=false
+mvn license:format
+
 git commit -m "initiate release ${VERSION}" -a
 
 echo "Start release"
@@ -33,7 +47,7 @@ git ls-remote --exit-code --tags origin ${TAG} && quit "tag ${TAG} already exist
 
 #Working version ?
 # Well, we assume the tests have been run before, and everything is OK for the release
-mvn clean test ||exit 1
+#mvn clean test ||exit 1
 
 git fetch origin master:refs/remotes/origin/master||quit "Unable to fetch master"
 #Integrate with master and tag
@@ -56,18 +70,11 @@ mvn -P release clean javadoc:jar source:jar deploy -DskipTests ||quit "Unable to
 
 #Set the next development version
 #echo "** Prepare develop for the next version **"
-git checkout develop ||quit "Unable to checkout develop"
-git pull origin develop ||quit "Unable to pull develop"
-git merge --no-ff -m "Merge tag '${TAG}' into develop"  ${TAG} ||quit "Unable to integrate to develop"
 mvn versions:set -DnewVersion=${NEXT} -DgenerateBackupPoms=false
-git commit -m "Prepare the code for the next version" -a ||quit "Unable to commit to develop"
+git commit -m "Prepare the code for ${VERSION}" -a ||quit "Unable to commit to master"
 #
 ##Push changes on develop, with the tag
-git push origin develop ||quit "Unable to push to develop"
+git push origin master ||quit "Unable to push to master"
 
 #Clean
 git branch --delete release ||quit "Unable to delete release"
-
-git checkout $TAG
-mvn clean install -DskipTests
-git checkout develop
